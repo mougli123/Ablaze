@@ -192,6 +192,7 @@ public class Player : MonoBehaviour {
             anim.SetBool("boost", false);
         }
 
+        transform.localScale = new Vector3(-dir, 1, 1);
         transform.position = new Vector2(transform.position.x + xvel * Time.fixedDeltaTime, transform.position.y + yvel * Time.fixedDeltaTime);
 
         if (transform.position.y < -500f) {
