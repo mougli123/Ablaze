@@ -3,12 +3,12 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 
-    bool grounded, jumping, bursted, ceilinged;
+    bool grounded, jumping, bursted, ceilinged, fly;
 
     float dir;
 
     float yvel, xvel, flytime, burstime;
-    GameObject fireBurst;
+    GameObject fireBurst, burstCandle;
 
     Vector2 startposition;
 
@@ -29,10 +29,11 @@ public class Player : MonoBehaviour {
 
         // If Not Bursting Forward
         if (burstime <= 0f) {
-            float i = -0.4f;    // Iterator value
+            var i = -0.4f;    // Iterator value
             do {
-                grnd = Physics2D.Raycast(transform.position + new Vector3(i, 0, 0), Vector2.down, 0.5f);    // Raycast Downward to find ground
-                grounded = (grnd.collider != null);                                                         // Whether we are grounded depends on the cast results
+                // Raycast Downward to find ground
+                grnd = Physics2D.Raycast(transform.position + new Vector3(i, 0, 0), Vector2.down, 0.5f);
+                grounded = (grnd.collider != null);                                                         
                 i += 0.4f;
             }
             while (i <= 0.4f && !grounded);
@@ -43,11 +44,19 @@ public class Player : MonoBehaviour {
                 burstime = 0f;
                 flytime = 0f;
                 jumping = false;
+                fly = false;
+
+                // If the distance to the ground is less than center point, become centered above collider.
                 if (grnd.distance < 0.5f) {
-                    transform.position = new Vector2(transform.position.x, grnd.collider.transform.position.y + 1f);    // If the distance to the ground is less than center point, become centered above collider.
+                    transform.position = new Vector2(transform.position.x, grnd.collider.transform.position.y + 1f);
                 }
-                if ((flytime <= 0 || burstime <= 0) && !bursted && fireBurst != null) {
-                    GameObject.Destroy(fireBurst);
+                if ((flytime <= 0 || burstime <= 0) && !bursted) {
+                    if (fireBurst != null) {
+                        fireBurst.GetComponent<ParticleSystem>().loop = false;
+                    }
+                    if (burstCandle != null) {
+                        burstCandle.GetComponent<ParticleSystem>().loop = false;
+                    }
                 }
             }
             else {
@@ -80,7 +89,8 @@ public class Player : MonoBehaviour {
             grndmod = grounded ? 1f : 2.5f;
         }
         else grndmod = 1.25f;
-        if (bursted) grndmod *= 2;
+        if (bursted) grndmod *= 2f;
+        if (fly) grndmod *= 3f;
 
         float speed = 0f;
         if (burstime <= 0f) {
@@ -96,9 +106,6 @@ public class Player : MonoBehaviour {
         else {
             yvel = 0f;
             burstime -= Time.deltaTime;
-            if (burstime <= 0f) {
-                GameObject.Destroy(fireBurst);
-            }
         }
 
         RaycastHit2D movechek = Physics2D.Raycast(transform.position, Vector2.right * dir, 0.5f);
@@ -115,7 +122,10 @@ public class Player : MonoBehaviour {
         // When Jump is pressed
         if (Input.GetKeyDown(KeyCode.X) && grounded) {
             jumping = true;
-            yvel = 12.5f;
+            yvel = 13.5f;
+            if (flytime > 0f) {
+                burstCandle.GetComponent<ParticleSystem>().startLifetime = 0.25f;
+            }
         }
 
         // When Jump is released while in the air
@@ -125,9 +135,12 @@ public class Player : MonoBehaviour {
             }
             if (bursted) {
                 burstime = 0.10f;
-                xvel = 30f*dir;
+                xvel = 35f*dir;
                 bursted = false;
                 Debug.Log("Whoosh, dir = " + dir);
+            }
+            if (flytime > 0f) {
+                burstCandle.GetComponent<ParticleSystem>().startLifetime = 0.15f;
             }
         }
 
@@ -136,13 +149,20 @@ public class Player : MonoBehaviour {
             if (yvel <= 0f && flytime <= 0f && bursted) {
                 flytime = 0.5f;
                 bursted = false;
+                fly = true;
+                burstCandle = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFirePink"), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
+
+                ParticleSystem bcps = burstCandle.GetComponent<ParticleSystem>();
+                bcps.simulationSpace = ParticleSystemSimulationSpace.Local;
+                bcps.startLifetime = 0.25f;
+                bcps.GetComponent<ParticleSystem>().startSpeed = 10f;
             }
             if (flytime > 0f) {
                 yvel = ceilinged ? 0f : 5f;
                 flytime -= Time.deltaTime;
-                fireBurst.GetComponent<ParticleSystem>().startLifetime = flytime/2;
                 if (flytime <= 0f) {
-                    GameObject.Destroy(fireBurst);
+                    fireBurst.GetComponent<ParticleSystem>().loop = false;
+                    burstCandle.GetComponent<ParticleSystem>().loop = false;
                 }
             }
         }
