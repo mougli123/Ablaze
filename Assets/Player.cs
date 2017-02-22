@@ -105,7 +105,7 @@ public class Player : MonoBehaviour {
         }
         else {
             yvel = 0f;
-            burstime -= Time.deltaTime;
+            burstime -= Time.fixedDeltaTime;
         }
 
         RaycastHit2D movechek = Physics2D.Raycast(transform.position, Vector2.right * dir, 0.5f);
@@ -122,7 +122,7 @@ public class Player : MonoBehaviour {
         // When Jump is pressed
         if (Input.GetKeyDown(KeyCode.X) && grounded) {
             jumping = true;
-            yvel = 13.5f;
+            yvel = 10.5f;
             if (flytime > 0f) {
                 burstCandle.GetComponent<ParticleSystem>().startLifetime = 0.25f;
             }
@@ -134,7 +134,7 @@ public class Player : MonoBehaviour {
                 yvel = 0f;
             }
             if (bursted) {
-                burstime = 0.10f;
+                burstime = 0.125f;
                 xvel = 35f*dir;
                 bursted = false;
                 Debug.Log("Whoosh, dir = " + dir);
@@ -159,7 +159,7 @@ public class Player : MonoBehaviour {
             }
             if (flytime > 0f) {
                 yvel = ceilinged ? 0f : 5f;
-                flytime -= Time.deltaTime;
+                flytime -= Time.fixedDeltaTime;
                 if (flytime <= 0f) {
                     fireBurst.GetComponent<ParticleSystem>().loop = false;
                     burstCandle.GetComponent<ParticleSystem>().loop = false;
@@ -174,7 +174,7 @@ public class Player : MonoBehaviour {
             Debug.Log("Bursted");
         }
 
-        transform.position = new Vector2(transform.position.x + xvel * Time.deltaTime, transform.position.y + yvel * Time.deltaTime);
+        transform.position = new Vector2(transform.position.x + xvel * Time.fixedDeltaTime, transform.position.y + yvel * Time.fixedDeltaTime);
 
         if (transform.position.y < -500f) {
             transform.position = startposition;
