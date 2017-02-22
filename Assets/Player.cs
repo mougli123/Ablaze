@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 
-    bool grounded, jumping, bursted;
+    bool grounded, jumping, bursted, ceilinged;
 
     float dir;
 
@@ -62,10 +62,12 @@ public class Player : MonoBehaviour {
                     while (i <= 0.5f && ceiling.collider == null);
                     if (ceiling.collider != null) {
                         yvel = 0;
-                        flytime = 0f;
-                        bursted = false;
+                        ceilinged = true;
                     }
-                    else yvel = yvel * 0.9f;
+                    else {
+                        ceilinged = false;
+                        yvel = yvel * 0.9f;
+                    }
                 }
                 else {
                     yvel = yvel * 1.098f;
@@ -136,7 +138,7 @@ public class Player : MonoBehaviour {
                 bursted = false;
             }
             if (flytime > 0f) {
-                yvel = 5f;
+                yvel = ceilinged ? 0f : 5f;
                 flytime -= Time.deltaTime;
                 fireBurst.GetComponent<ParticleSystem>().startLifetime = flytime/2;
                 if (flytime <= 0f) {
