@@ -10,6 +10,8 @@ public class Player : MonoBehaviour {
     float yvel, xvel, flytime, burstime;
     GameObject fireBurst, burstCandle;
 
+    Animator anim;
+
     Vector2 startposition;
 
     // Use this for initialization
@@ -18,6 +20,7 @@ public class Player : MonoBehaviour {
         xvel = 0f;
         dir = 1f;
         startposition = transform.position;
+        anim = this.GetComponent<Animator>();
         grounded = false;
         jumping = false;
     }
@@ -108,6 +111,7 @@ public class Player : MonoBehaviour {
             burstime -= Time.fixedDeltaTime;
         }
 
+        // Check for legal movement by casting forward
         RaycastHit2D movechek = Physics2D.Raycast(transform.position, Vector2.right * dir, 0.5f);
         if (movechek.collider != null) {
             transform.position = new Vector2(movechek.collider.transform.position.x - dir, transform.position.y);
@@ -137,6 +141,7 @@ public class Player : MonoBehaviour {
                 burstime = 0.125f;
                 xvel = 35f*dir;
                 bursted = false;
+                anim.SetBool("boost", true);
                 Debug.Log("Whoosh, dir = " + dir);
             }
             if (flytime > 0f) {
@@ -172,6 +177,19 @@ public class Player : MonoBehaviour {
             fireBurst = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFireBurstPink"), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
             bursted = true;
             Debug.Log("Bursted");
+        }
+
+        // Animation Control Settings
+        if (yvel > 0) {
+            anim.SetInteger("ydir", 1);
+        }
+        else if (yvel < 0) {
+            anim.SetInteger("ydir", -1);
+        }
+        else anim.SetInteger("ydir", 0);
+
+        if (burstime < 0f) {
+            anim.SetBool("boost", false);
         }
 
         transform.position = new Vector2(transform.position.x + xvel * Time.fixedDeltaTime, transform.position.y + yvel * Time.fixedDeltaTime);
