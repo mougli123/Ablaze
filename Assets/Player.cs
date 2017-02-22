@@ -26,22 +26,25 @@ public class Player : MonoBehaviour {
     void Update() {
         RaycastHit2D grnd;
         grounded = false;
+
+        // If Not Bursting Forward
         if (burstime <= 0f) {
-            float i = -0.4f;
+            float i = -0.4f;    // Iterator value
             do {
-                grnd = Physics2D.Raycast(transform.position + new Vector3(i, 0, 0), Vector2.down, 0.5f);
-                grounded = (grnd.collider != null);
+                grnd = Physics2D.Raycast(transform.position + new Vector3(i, 0, 0), Vector2.down, 0.5f);    // Raycast Downward to find ground
+                grounded = (grnd.collider != null);                                                         // Whether we are grounded depends on the cast results
                 i += 0.4f;
             }
             while (i <= 0.4f && !grounded);
 
+            // If on the ground
             if (grounded) {
                 yvel = 0;
                 burstime = 0f;
                 flytime = 0f;
                 jumping = false;
-                if (grnd.distance <= 0.5f) {
-                    transform.position = new Vector2(transform.position.x, grnd.collider.transform.position.y + 1f);
+                if (grnd.distance < 0.5f) {
+                    transform.position = new Vector2(transform.position.x, grnd.collider.transform.position.y + 1f);    // If the distance to the ground is less than center point, become centered above collider.
                 }
                 if ((flytime <= 0 || burstime <= 0) && !bursted && fireBurst != null) {
                     GameObject.Destroy(fireBurst);
@@ -57,7 +60,11 @@ public class Player : MonoBehaviour {
                         i += 0.45f;
                     }
                     while (i <= 0.5f && ceiling.collider == null);
-                    if (ceiling.collider != null) yvel = 0;
+                    if (ceiling.collider != null) {
+                        yvel = 0;
+                        flytime = 0f;
+                        bursted = false;
+                    }
                     else yvel = yvel * 0.9f;
                 }
                 else {
@@ -103,10 +110,13 @@ public class Player : MonoBehaviour {
             }
         }
 
+        // When Jump is pressed
         if (Input.GetKeyDown(KeyCode.X) && grounded) {
             jumping = true;
             yvel = 12.5f;
         }
+
+        // When Jump is released while in the air
         if (Input.GetKeyUp(KeyCode.X) && !grounded) {
             if (yvel > 0f) {
                 yvel = 0f;
@@ -119,6 +129,7 @@ public class Player : MonoBehaviour {
             }
         }
 
+        // While holding down Jump
         if (Input.GetKey(KeyCode.X)) {
             if (yvel <= 0f && flytime <= 0f && bursted) {
                 flytime = 0.5f;
@@ -134,6 +145,7 @@ public class Player : MonoBehaviour {
             }
         }
 
+        // If Burst is pressed while grounded and not bursted, begin burst mode
         if (Input.GetKeyDown(KeyCode.Z) && grounded && !bursted) {
             fireBurst = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFireBurstPink"), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
             bursted = true;
