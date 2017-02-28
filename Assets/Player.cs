@@ -187,7 +187,7 @@ public class Player : MonoBehaviour {
                 bcps.GetComponent<ParticleSystem>().startSpeed = 10f;
             }
             if (flytime > 0f) {
-                yvel = ceilinged ? 0f : 5f;
+                yvel = ceilinged ? 0f : 8f;
                 flytime -= Time.fixedDeltaTime;
                 if (flytime <= 0f) {
                     fireBurst.GetComponent<ParticleSystem>().loop = false;
