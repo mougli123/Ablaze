@@ -48,11 +48,13 @@ public class Player : MonoBehaviour {
                 flytime = 0f;
                 jumping = false;
                 fly = false;
+                anim.SetBool("boost", false);
 
                 // If the distance to the ground is less than center point, become centered above collider.
                 if (grnd.distance < 0.5f) {
                     transform.position = new Vector2(transform.position.x, grnd.collider.transform.position.y + 1f);
                 }
+                // If burst has finished and we're on the ground, turn off the burst effect
                 if ((flytime <= 0 || burstime <= 0) && !bursted) {
                     if (fireBurst != null) {
                         fireBurst.GetComponent<ParticleSystem>().loop = false;
@@ -62,8 +64,11 @@ public class Player : MonoBehaviour {
                     }
                 }
             }
+            // If not on the ground
             else {
+                // Calculations depend on yvel not being 0
                 if (Mathf.Round(yvel) == 0) yvel = -1f;
+                // If we're ascending, check for hitting a ceiling
                 else if (yvel > 0) {
                     RaycastHit2D ceiling;
                     i = -0.45f;
@@ -81,12 +86,18 @@ public class Player : MonoBehaviour {
                         yvel = yvel * 0.9f;
                     }
                 }
+                // Fixed gravity multiplication for falling
                 else {
                     yvel = yvel * 1.098f;
                 }
             }
         }
 
+        /*
+        Speed modifier for being on the ground or in the air
+        Our speed if we fall off a ledge is severely inhibited, good for stairs
+        If jumping our horizontal speed is slightly inhibited as air control is lost
+        */
         float grndmod;
         if (!jumping) {
             grndmod = grounded ? 1f : 2.5f;
@@ -95,20 +106,29 @@ public class Player : MonoBehaviour {
         if (bursted) grndmod *= 2f;
         if (fly) grndmod *= 3f;
 
+        // Doing the jump
         float speed = 0f;
-        if (burstime <= 0f) {
-            if (Input.GetKey(KeyCode.LeftArrow)) {
-                dir = -1f;
-                speed = 3f;
+        if (!jumping || yvel <= 0f || flytime > 0f) {
+            if (burstime <= 0f) {
+                if (Input.GetKey(KeyCode.LeftArrow)) {
+                    dir = -1f;
+                    speed = jumping ? 2.5f : 3f;
+                }
+                else if (Input.GetKey(KeyCode.RightArrow)) {
+                    dir = 1f;
+                    speed = jumping ? 2.5f : 3f;
+                }
             }
-            else if (Input.GetKey(KeyCode.RightArrow)) {
-                dir = 1f;
-                speed = 3f;
+            else {
+                yvel = 0f;
+                burstime -= Time.fixedDeltaTime;
             }
         }
         else {
-            yvel = 0f;
-            burstime -= Time.fixedDeltaTime;
+            speed = Mathf.Abs(xvel) > 0 ? 3f : 0f;
+            if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow)) {
+                speed /= 2f;
+            }
         }
 
         // Check for legal movement by casting forward
@@ -126,20 +146,24 @@ public class Player : MonoBehaviour {
         // When Jump is pressed
         if (Input.GetKeyDown(KeyCode.X) && grounded) {
             jumping = true;
-            yvel = 10.5f;
+            yvel = 7.5f;
             if (flytime > 0f) {
                 burstCandle.GetComponent<ParticleSystem>().startLifetime = 0.25f;
             }
         }
 
         // When Jump is released while in the air
-        if (Input.GetKeyUp(KeyCode.X) && !grounded) {
+        if ((Input.GetKeyUp(KeyCode.X) || Input.GetKeyDown(KeyCode.X))&& !grounded) {
             if (yvel > 0f) {
                 yvel = 0f;
             }
-            if (bursted) {
-                burstime = 0.125f;
-                xvel = 35f*dir;
+            if (bursted || flytime > 0f) {
+                burstime = 0.15f;
+                if (flytime > 0f) {
+                    burstime = flytime/1.15f;
+                    flytime = 0f;
+                }
+                xvel = 15f*dir;
                 bursted = false;
                 anim.SetBool("boost", true);
                 Debug.Log("Whoosh, dir = " + dir);
@@ -151,8 +175,8 @@ public class Player : MonoBehaviour {
 
         // While holding down Jump
         if (Input.GetKey(KeyCode.X)) {
-            if (yvel <= 0f && flytime <= 0f && bursted) {
-                flytime = 0.5f;
+            if (Mathf.Round(yvel) == 0f && flytime <= 0f && bursted) {
+                flytime = 0.35f;
                 bursted = false;
                 fly = true;
                 burstCandle = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFirePink"), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
@@ -197,6 +221,10 @@ public class Player : MonoBehaviour {
 
         if (transform.position.y < -500f) {
             transform.position = startposition;
+            xvel = 0f;
+            yvel = 0f;
+            grounded = false;
+            bursted = false;
         }
     }
 }
