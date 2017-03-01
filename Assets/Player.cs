@@ -146,6 +146,8 @@ public class Player : MonoBehaviour {
         // When Jump is pressed
         if (Input.GetKeyDown(KeyCode.X) && grounded) {
             jumping = true;
+            GameObject obj = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFireBurstPink"), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
+            obj.GetComponent<ParticleSystem>().loop = false;
             yvel = 7.5f;
             if (flytime > 0f) {
                 burstCandle.GetComponent<ParticleSystem>().startLifetime = 0.25f;
@@ -158,12 +160,12 @@ public class Player : MonoBehaviour {
                 yvel = 0f;
             }
             if (bursted || flytime > 0f) {
-                burstime = 0.15f;
+                burstime = 0.125f;
                 if (flytime > 0f) {
                     burstime = flytime/1.15f;
                     flytime = 0f;
                 }
-                xvel = 15f*dir;
+                xvel = 20f*dir;
                 bursted = false;
                 anim.SetBool("boost", true);
                 Debug.Log("Whoosh, dir = " + dir);
@@ -215,6 +217,11 @@ public class Player : MonoBehaviour {
         if (burstime < 0f) {
             anim.SetBool("boost", false);
         }
+
+        if (grounded && Mathf.Abs(xvel) > 0) {
+            anim.SetBool("walking", true);
+        }
+        else anim.SetBool("walking", false);
 
         transform.localScale = new Vector3(-dir, 1, 1);
         transform.position = new Vector2(transform.position.x + xvel * Time.fixedDeltaTime, transform.position.y + yvel * Time.fixedDeltaTime);
