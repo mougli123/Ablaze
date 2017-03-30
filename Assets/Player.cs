@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 
+    string color = "Pink";
     bool grounded, jumping, bursted, ceilinged, fly;
 
     float dir;
@@ -29,6 +30,15 @@ public class Player : MonoBehaviour {
     void Update() {
         RaycastHit2D grnd;
         grounded = false;
+
+        if (transform.FindChild("SpriteFirePlrBurst" + color)) {
+            fireBurst = transform.FindChild("SpriteFirePlrBurst" + color).gameObject;
+        }
+
+        if (!transform.FindChild("SpriteFire" + color)) {
+            GameObject gobj = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFire" + color), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
+            gobj.name = "SpriteFire" + color;
+        }
 
         // If Not Bursting Forward
         if (burstime <= 0f) {
@@ -146,7 +156,7 @@ public class Player : MonoBehaviour {
         // When Jump is pressed
         if (Input.GetKeyDown(KeyCode.X) && grounded) {
             jumping = true;
-            GameObject obj = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFireBurstPink"), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
+            GameObject obj = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFireBurst" + color), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
             obj.GetComponent<ParticleSystem>().loop = false;
             yvel = 7.5f;
             if (flytime > 0f) {
@@ -181,7 +191,7 @@ public class Player : MonoBehaviour {
                 flytime = 0.35f;
                 bursted = false;
                 fly = true;
-                burstCandle = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFirePink"), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
+                burstCandle = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFire" + color), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
 
                 ParticleSystem bcps = burstCandle.GetComponent<ParticleSystem>();
                 bcps.simulationSpace = ParticleSystemSimulationSpace.Local;
@@ -192,15 +202,16 @@ public class Player : MonoBehaviour {
                 yvel = ceilinged ? 0f : 8f;
                 flytime -= Time.fixedDeltaTime;
                 if (flytime <= 0f) {
-                    fireBurst.GetComponent<ParticleSystem>().loop = false;
-                    burstCandle.GetComponent<ParticleSystem>().loop = false;
+                    if (fireBurst != null) fireBurst.GetComponent<ParticleSystem>().loop = false;
+                    if (burstCandle != null) burstCandle.GetComponent<ParticleSystem>().loop = false;
                 }
             }
         }
 
         // If Burst is pressed while grounded and not bursted, begin burst mode
         if (Input.GetKeyDown(KeyCode.Z) && grounded && !bursted) {
-            fireBurst = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFireBurstPink"), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
+            fireBurst = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFireBurst" + color), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
+            fireBurst.name = "SpriteFirePlrBurst" + color;
             bursted = true;
             Debug.Log("Bursted");
         }
@@ -233,5 +244,21 @@ public class Player : MonoBehaviour {
             grounded = false;
             bursted = false;
         }
+    }
+
+    public bool getBursting() {
+        if (bursted || burstime > 0f || flytime > 0f) {
+            return true;
+        }
+        else return false;
+    }
+
+    public void setColor(string clr) {
+        color = clr;
+        if (fireBurst != null) fireBurst.GetComponent<ParticleSystem>().loop = false;
+    }
+
+    public string getColor() {
+        return color;
     }
 }
