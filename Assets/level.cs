@@ -9,8 +9,13 @@ public class level : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
-	}
+        foreach (GameObject j in GameObject.FindGameObjectsWithTag("Block")) {
+            if (j.transform.position.x < lefp) lefp = j.transform.position.x;
+            if (j.transform.position.x > rgtp) rgtp = j.transform.position.x;
+            if (j.transform.position.y < lowp) lowp = j.transform.position.y;
+            if (j.transform.position.y > hihp) hihp = j.transform.position.y;
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {

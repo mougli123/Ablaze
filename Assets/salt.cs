@@ -15,7 +15,7 @@ public class salt : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	    if (ply.getBursting() && isNear()) {
-            Debug.Log(color);
+            //Debug.Log(color);
             if (color != ply.getColor()) {
                 GameObject frobj;
                 if (ply.transform.FindChild("SpriteFire" + ply.getColor())) {

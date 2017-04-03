@@ -10,6 +10,7 @@ public class Player : MonoBehaviour {
 
     float yvel, xvel, flytime, burstime;
     GameObject fireBurst, burstCandle;
+    level lvl;
 
     Animator anim;
 
@@ -22,6 +23,7 @@ public class Player : MonoBehaviour {
         dir = 1f;
         startposition = transform.position;
         anim = this.GetComponent<Animator>();
+        lvl = GameObject.FindGameObjectWithTag("Level").GetComponent<level>();
         grounded = false;
         jumping = false;
     }
@@ -122,11 +124,11 @@ public class Player : MonoBehaviour {
             if (burstime <= 0f) {
                 if (Input.GetKey(KeyCode.LeftArrow)) {
                     dir = -1f;
-                    speed = jumping ? 2.5f : 3f;
+                    if (transform.position.x > lvl.lefp) speed = jumping ? 2.5f : 3f;
                 }
                 else if (Input.GetKey(KeyCode.RightArrow)) {
                     dir = 1f;
-                    speed = jumping ? 2.5f : 3f;
+                    if (transform.position.x < lvl.rgtp) speed = jumping ? 2.5f : 3f;
                 }
             }
             else {
@@ -178,7 +180,7 @@ public class Player : MonoBehaviour {
                 xvel = 20f*dir;
                 bursted = false;
                 anim.SetBool("boost", true);
-                Debug.Log("Whoosh, dir = " + dir);
+                //Debug.Log("Whoosh, dir = " + dir);
             }
             if (flytime > 0f) {
                 burstCandle.GetComponent<ParticleSystem>().startLifetime = 0.15f;
@@ -213,7 +215,7 @@ public class Player : MonoBehaviour {
             fireBurst = GameObject.Instantiate(Resources.Load<GameObject>("Particles/SpriteFireBurst" + color), transform.position, Quaternion.Euler(-90f, 0, 0), this.transform) as GameObject;
             fireBurst.name = "SpriteFirePlrBurst" + color;
             bursted = true;
-            Debug.Log("Bursted");
+            //Debug.Log("Bursted");
         }
 
         // Animation Control Settings
@@ -235,6 +237,8 @@ public class Player : MonoBehaviour {
         else anim.SetBool("walking", false);
 
         transform.localScale = new Vector3(-dir, 1, 1);
+
+        if ((dir == -1 && transform.position.x < lvl.lefp) || (dir == 1 && transform.position.x > lvl.rgtp)) xvel = 0f;
         transform.position = new Vector2(transform.position.x + xvel * Time.fixedDeltaTime, transform.position.y + yvel * Time.fixedDeltaTime);
 
         if (transform.position.y < -500f) {
