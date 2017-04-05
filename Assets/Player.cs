@@ -114,7 +114,10 @@ public class Player : MonoBehaviour {
         if (!jumping) {
             grndmod = grounded ? 1f : 2.5f;
         }
-        else grndmod = 1.25f;
+        else {
+            grndmod = 1.25f;
+            if (yvel < 0) grndmod = 2.5f;
+        }
         if (bursted) grndmod *= 2f;
         if (fly) grndmod *= 3f;
 
@@ -264,5 +267,13 @@ public class Player : MonoBehaviour {
 
     public string getColor() {
         return color;
+    }
+
+    public bool getGrounded() {
+        return grounded;
+    }
+    
+    public bool getJumping() {
+        return jumping;
     }
 }
