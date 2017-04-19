@@ -11,8 +11,11 @@ public class cameracontrol : MonoBehaviour {
     public float target; // range from -3 to 3, positive meants the player should be below the camera, negative means player should be above the camera.
 
     public float shaketime = 0f;
+    public bool hardshake;
 
-    float shake = 0.15f;
+    float shake = 0.1f;
+
+    private float lowp, lefp, rgtp, hihp;
 
     /*
     Depending on the type of level you might want the player to start at the bottom and go up or start at the top and go down.
@@ -27,17 +30,32 @@ public class cameracontrol : MonoBehaviour {
     Do not make Target any larger than the camera can see or things'll go not your way friend.
     */
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         if (GameObject.FindGameObjectWithTag("Player")) {
             ply = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
             lvl = GameObject.FindGameObjectWithTag("Level").GetComponent<level>();
 
+
+            // ensure the camera starts out inside the level
+            if (GameObject.FindGameObjectWithTag("Block")) {
+                GameObject[] arg = GameObject.FindGameObjectsWithTag("Block");
+                rgtp = lefp = arg[0].transform.position.x;
+                lowp = hihp = arg[0].transform.position.y;
+
+                foreach (GameObject j in arg) {
+                    if (j.transform.position.x < lefp) lefp = j.transform.position.x;
+                    if (j.transform.position.x > rgtp) rgtp = j.transform.position.x;
+                    if (j.transform.position.y < lowp) lowp = j.transform.position.y;
+                    if (j.transform.position.y > hihp) hihp = j.transform.position.y;
+                }
+            }
+
             if (target > 0) {
-                transform.position = new Vector3((lvl.lefp + lvl.rgtp) / 2f, lvl.lowp + 4, transform.position.z);
+                transform.position = new Vector3((lefp + rgtp) / 2f, lowp + 4, transform.position.z);
             }
             else {
-                transform.position = new Vector3((lvl.lefp + lvl.rgtp) / 2f, lvl.hihp - 4, transform.position.z);
+                transform.position = new Vector3((lefp + rgtp) / 2f, hihp - 4, transform.position.z);
             }
         }
     }
@@ -69,11 +87,17 @@ public class cameracontrol : MonoBehaviour {
 
 
             if (shaketime > 0f) {
+                if (hardshake && Mathf.Abs(shake) != 0.25f) shake = 0.25f;
                 xchange += shake;
-                lerpy += shake;
+
+                if (hihp - lowp > 13) lerpy += shake;
 
                 shake *= -1;
                 shaketime -= Time.fixedDeltaTime;
+            }
+            else {
+                hardshake = false;
+                shake = 0.1f;
             }
 
             if (ply.transform.position.x < 1000f) {

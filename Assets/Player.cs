@@ -4,18 +4,22 @@ using System.Collections;
 [System.Serializable]
 public class Player : MonoBehaviour {
 
+    public bool respawning;
+
     string color = "Pink";
     bool grounded, jumping, bursted, ceilinged, fly, dead;
 
     int killcount;
 
     float dir;
+    float transitiontime;
 
     float yvel, xvel, flytime, burstime;
+    cameracontrol cam;
     GameObject fireBurst, burstCandle;
     level lvl;
 
-    Animator anim;
+    Animator anim, UIanim;
 
     Vector2 startposition;
 
@@ -26,7 +30,9 @@ public class Player : MonoBehaviour {
         dir = 1f;
         startposition = transform.position;
         anim = this.GetComponent<Animator>();
+        UIanim = GameObject.FindGameObjectWithTag("Trickery").GetComponent<Animator>();
         lvl = GameObject.FindGameObjectWithTag("Level").GetComponent<level>();
+        cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<cameracontrol>();
         killcount = 0;
         grounded = false;
         jumping = false;
@@ -283,7 +289,6 @@ public class Player : MonoBehaviour {
                 }
             }
             else {
-
                 if (GameObject.Find("deathfire0")) {
                     for (int i = 0; i < 3; i++) {
                         frobj = GameObject.Find("deathfire" + i);
@@ -292,6 +297,17 @@ public class Player : MonoBehaviour {
                 }
                 else {
                     transform.position = new Vector2(1000f, 1000f);
+                    UIanim.SetBool("screenBlack", true);
+                    transitiontime -= Time.fixedDeltaTime;
+                    respawning = true;
+                    if (transitiontime <= 0f) {
+                        respawning = false;
+                        foreach (GameObject g in GameObject.FindGameObjectsWithTag("Foe")) {
+                            g.GetComponent<EnemyGeneric>().revive = true;
+                        }
+                        UIanim.SetBool("screenBlack", false);
+                        revive();
+                    }
                 }
             }
         }
@@ -299,6 +315,13 @@ public class Player : MonoBehaviour {
 
     public void kill() {
         dead = true;
+        transitiontime = 1f;
+    }
+
+    void revive() {
+        dead = false;
+        anim.SetBool("dead", false);
+        transform.position = startposition;
     }
 
     public bool getBursting() {
@@ -339,5 +362,9 @@ public class Player : MonoBehaviour {
 
     public float getYVel() {
         return yvel;
+    }
+
+    public void refreshBurst() {
+        burstime += 0.075f;
     }
 }

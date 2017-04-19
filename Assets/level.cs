@@ -7,8 +7,16 @@ public class level : MonoBehaviour {
 
     public float lowp, lefp, rgtp, hihp;
 
+    Animator anim;
+    
 	// Use this for initialization
 	void Start () {
+        if (!GameObject.FindGameObjectWithTag("Trickery")) {
+            GameObject.Instantiate(Resources.Load("Scripting/Interface"));
+        }
+        anim = GameObject.FindGameObjectWithTag("Trickery").GetComponent<Animator>();
+        anim.SetBool("screenBlack", true);
+
         if (GameObject.FindGameObjectWithTag("Block")) {
             GameObject[] arg = GameObject.FindGameObjectsWithTag("Block");
             rgtp = lefp = arg[0].transform.position.x;
@@ -28,6 +36,7 @@ public class level : MonoBehaviour {
                 j.gameObject.transform.parent = this.transform;
             }
         }
+        anim.SetBool("screenBlack", false);
     }
 	
 	// Update is called once per frame
