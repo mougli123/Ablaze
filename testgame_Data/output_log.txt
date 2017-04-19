@@ -2,9 +2,9 @@ Mono path[0] = 'C:/Users/Carl/Documents/UNITY/school/Ablaze/testgame_Data/Manage
 Mono path[1] = 'C:/Users/Carl/Documents/UNITY/school/Ablaze/testgame_Data/Mono'
 Mono config path = 'C:/Users/Carl/Documents/UNITY/school/Ablaze/testgame_Data/Mono/etc'
 PlayerConnection initialized from C:/Users/Carl/Documents/UNITY/school/Ablaze/testgame_Data (debug = 0)
-PlayerConnection initialized network socket : 0.0.0.0 55139
-Broadcasting "[IP] 169.254.3.147 [Port] 55139 [Flags] 2 [Guid] 589327820 [EditorId] 332005726 [Version] 1048832 [Id] WindowsPlayer(CDM) [Debug] 0" to [169.254.255.255:54997]...
-PlayerConnection already initialized - listening to [169.254.3.147:55139]
+PlayerConnection initialized network socket : 0.0.0.0 55175
+Broadcasting "[IP] 169.254.3.147 [Port] 55175 [Flags] 2 [Guid] 1497094761 [EditorId] 1225943801 [Version] 1048832 [Id] WindowsPlayer(CDM) [Debug] 0" to [169.254.255.255:54997]...
+PlayerConnection already initialized - listening to [169.254.3.147:55175]
 Initialize engine version: 5.4.1f1 (649f48bbbf0f)
 GfxDevice: creating device client; threaded=1
 Direct3D:
@@ -21,14 +21,14 @@ Platform assembly: C:\Users\Carl\Documents\UNITY\school\Ablaze\testgame_Data\Man
 Loading C:\Users\Carl\Documents\UNITY\school\Ablaze\testgame_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
 Platform assembly: C:\Users\Carl\Documents\UNITY\school\Ablaze\testgame_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
 Loading C:\Users\Carl\Documents\UNITY\school\Ablaze\testgame_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.049 seconds
+- Completed reload, in  0.098 seconds
 Platform assembly: C:\Users\Carl\Documents\UNITY\school\Ablaze\testgame_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\Carl\Documents\UNITY\school\Ablaze\testgame_Data\Managed\System.dll (this message is harmless)
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 1.167687 ms
+UnloadTime: 3.473856 ms
 Setting up 2 worker threads for Enlighten.
-  Thread -> id: 1650 -> priority: 1 
-  Thread -> id: 3b04 -> priority: 1 
+  Thread -> id: 7594 -> priority: 1 
+  Thread -> id: 84b4 -> priority: 1 
